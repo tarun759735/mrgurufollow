@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Social Media Services</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(45deg, #f9ce34, #ee2a7b, #6228d7); /* Instagram gradient */
+      color: white;
+      text-align: center;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1 {
+      margin: 20px;
+    }
+    .service-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      width: 90%;
+      max-width: 1000px;
+    }
+    .card {
+      background: rgba(255,255,255,0.1);
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+    .btn {
+      margin-top: 10px;
+      background: #ff4757;
+      border: none;
+      padding: 10px 15px;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .btn:hover {
+      background: #e84118;
+    }
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .modal-content {
+      background: white;
+      color: black;
+      padding: 20px;
+      border-radius: 15px;
+      width: 320px;
+      text-align: center;
+    }
+    .modal-content img {
+      border: 2px solid #ccc;
+      border-radius: 10px;
+    }
+    .close {
+      margin-top: 10px;
+      background: gray;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    #history {
+      margin: 30px;
+      background: rgba(0,0,0,0.3);
+      padding: 15px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 600px;
+    }
+    #history ul {
+      list-style: none;
+      padding: 0;
+    }
+    #history li {
+      background: rgba(255,255,255,0.1);
+      margin: 5px 0;
+      padding: 8px;
+      border-radius: 6px;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+  <h1>📲 Social Media Services</h1>
+
+  <div class="service-list">
+    <!-- Instagram -->
+    <div class="card">
+      <h3>Instagram 1K Followers</h3>
+      <p>₹10</p>
+      <button class="btn" onclick="openModal('Instagram 1K Followers', 10)">Buy Now</button>
+    </div>
+    <div class="card">
+      <h3>Instagram 10K Followers</h3>
+      <p>₹100</p>
+      <button class="btn" onclick="openModal('Instagram 10K Followers', 100)">Buy Now</button>
+    </div>
+    
+    <!-- YouTube -->
+    <div class="card">
+      <h3>YouTube 1K Subscribers</h3>
+      <p>₹30</p>
+      <button class="btn" onclick="openModal('YouTube 1K Subscribers', 30)">Buy Now</button>
+    </div>
+    <div class="card">
+      <h3>YouTube 10K Subscribers</h3>
+      <p>₹290</p>
+      <button class="btn" onclick="openModal('YouTube 10K Subscribers', 290)">Buy Now</button>
+    </div>
+    <div class="card">
+      <h3>YouTube 4000Hrs Monetization</h3>
+      <p>₹1299</p>
+      <button class="btn" onclick="openModal('YouTube 4000Hrs Monetization', 1299)">Buy Now</button>
+    </div>
+    
+    <!-- Facebook -->
+    <div class="card">
+      <h3>Facebook 1K Followers</h3>
+      <p>₹10</p>
+      <button class="btn" onclick="openModal('Facebook 1K Followers', 10)">Buy Now</button>
+    </div>
+    <div class="card">
+      <h3>Facebook 10K Followers</h3>
+      <p>₹100</p>
+      <button class="btn" onclick="openModal('Facebook 10K Followers', 100)">Buy Now</button>
+    </div>
+    
+    <!-- Threads -->
+    <div class="card">
+      <h3>Threads 1K Followers</h3>
+      <p>₹35</p>
+      <button class="btn" onclick="openModal('Threads 1K Followers', 35)">Buy Now</button>
+    </div>
+  </div>
+
+  <!-- Payment Modal -->
+<div class="modal" id="paymentModal">
+  <div class="modal-content">
+    <h2 id="serviceName"></h2>
+    <p><b>Payable Amount: ₹<span id="payAmount"></span></b></p>
+    <img id="qrCode" src="" alt="QR Code" style="width:220px; margin-bottom:1rem;">
+    <p>📲 Scan QR to Pay</p>
+    <input type="url" placeholder="Enter Payment URL (after paying)">
+    <button class="btn" onclick="redirectToConfirmation()">Paid</button>
+    <br>
+    <button class="close" onclick="closeModal()">Close</button>
+  </div>
+</div>
+  
+  <!-- Confirmation Page -->
+  <div class="modal" id="confirmationPage">
+    <div class="modal-content">
+      <h2>✅ Payment Confirmation</h2>
+      <p>Our system will check the payment.</p>
+      <p>If you have paid the exact amount, you will get your service.</p>
+      <button class="close" onclick="closeConfirmation()">Close</button>
+    </div>
+  </div>
+  
+  <!-- Purchase History -->
+  <div id="history">
+    <h3>🕒 Purchase History</h3>
+    <ul id="historyList"></ul>
+  </div>
+
+  <script>
+    let selectedService = "";
+    let selectedAmount = 0;
+    const upiId = "pranksainiapks@fam";   // your UPI ID
+    const upiName = "PrankSaini";         // your display name
+
+    // Open Payment Modal
+    function openModal(service, amount) {
+      selectedService = service;
+      selectedAmount = amount;
+      document.getElementById("paymentModal").style.display = "flex";
+      document.getElementById("serviceName").innerText = service;
+	  
+	  // Show modal
+    document.getElementById("paymentModal").style.display = "flex";
+    document.getElementById("serviceName").innerText = service;
+    document.getElementById("payAmount").innerText = amount; // show amounts
+
+       // Generate dynamic QR with fixed amount
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=upi://pay?pa=${upiId}&pn=${upiName}&am=${amount}&cu=INR`;
+    document.getElementById("qrCode").src = qrUrl;
+    }
+
+    function closeModal() {
+      document.getElementById("paymentModal").style.display = "none";
+    }
+
+    // After clicking Paid
+    function redirectToConfirmation() {
+      document.getElementById("paymentModal").style.display = "none";
+      document.getElementById("confirmationPage").style.display = "flex";
+
+      // Add to history log
+      const now = new Date().toLocaleString();
+      const newEntry = document.createElement("li");
+      newEntry.textContent = `${now} - ${selectedService} (₹${selectedAmount})`;
+      
+      if (historyList.children[0].innerText === "No transactions yet.") {
+        historyList.innerHTML = ""; // clear default
+      }
+      historyList.appendChild(newEntry);
+    }
+
+    function closeConfirmation() {
+      document.getElementById("confirmationPage").style.display = "none";
+    }
+      </script>
+</body>
+</html>
